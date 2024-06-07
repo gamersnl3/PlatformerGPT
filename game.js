@@ -144,12 +144,27 @@ const camera = {
   }
 };
 
+let scale = 1;  // Default scale
+
+function setScale() {
+  const minWidth = 800;  // Minimum width before scaling
+  const minHeight = 600;  // Minimum height before scaling
+
+  // Calculate the scale based on the canvas size
+  if (canvas.width < minWidth || canvas.height < minHeight) {
+    scale = Math.min(canvas.width / minWidth, canvas.height / minHeight);
+  } else {
+    scale = 1;
+  }
+}
+
 // Function to set the canvas size and adjust the camera
 function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
   camera.width = canvas.width;
   camera.height = canvas.height;
+  setScale();  // Set the scale based on the new canvas size
 }
 
 resizeCanvas();  // Initial call to set the canvas size
@@ -348,11 +363,21 @@ function update() {
 
   // Update camera position to follow the player
   camera.follow(player);
+  
   drawClouds();  // Draw clouds first
   drawStars();   // Draw stars after clouds for proper layering
-  // Translate the canvas context based on the camera position
+
+  const offsetX = (canvas.width - canvas.width * scale) / 2;
+  const offsetY = (canvas.height - canvas.height * scale) / 2;
+
+  // Apply scaling
   ctx.save();
+  ctx.translate(offsetX, offsetY);
+  ctx.scale(scale, scale);
+  
+  // Translate the canvas context based on the camera position
   ctx.translate(-camera.x, -camera.y);
+
 
   drawPlatforms();
   drawPlayer();
@@ -367,9 +392,10 @@ function update() {
 }
 
 playerImage.onload = function () {
+  setScale();  // Set initial scale
   update();
 }
 
 // Event listener to resize the canvas when the window is resized
 window.addEventListener('resize', resizeCanvas);
-console.log(canvas.width, canvas.height);
+resizeCanvas();  // Initial call to set the canvas size and scale
