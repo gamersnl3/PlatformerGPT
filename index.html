@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Platformer Game</title>
+  <style>
+    #leftButton,
+    #rightButton,
+    #upButton,
+    #downButton {
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      -o-user-select: none;
+    }
+
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+      background: #87CEEB;
+    }
+
+    .controls {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+    }
+
+    .control-button {
+      width: 50px;
+      height: 50px;
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 20px;
+      text-align: center;
+      line-height: 50px;
+    }
+  </style>
+</head>
+
+<body>
+  <audio id="jumpSound" src="resources/jump.mp3"></audio>
+  <audio id="meow0" src="resources/meow0.mp3"></audio>
+  <audio id="meow1" src="resources/meow1.mp3"></audio>
+  <audio id="meow2" src="resources/meow2.mp3"></audio>
+  <audio id="meow3" src="resources/meow3.mp3"></audio>
+  <audio id="meow4" src="resources/meow4.mp3"></audio>
+  <audio id="meow5" src="resources/meow5.mp3"></audio>
+  <audio id="meow6" src="resources/meow6.mp3"></audio>
+  <audio id="meow7" src="resources/meow7.mp3"></audio>
+  <audio id="meow8" src="resources/meow8.mp3"></audio>
+
+  <canvas id="gameCanvas"></canvas>
+  <div class="controls">
+    <button class="control-button" id="leftButton">◄</button>
+    <button class="control-button" id="upButton">▲</button>
+    <button class="control-button" id="downButton">▼</button>
+    <button class="control-button" id="rightButton">►</button>
+  </div>
+  <script src="game.js"></script>
+</body>
+
+</html>
