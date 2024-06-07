@@ -72,8 +72,8 @@ const player = {
   grounded: false, // New property to check if player is grounded
   maxHeight: Number.MAX_SAFE_INTEGER,
   newPlatformThreshold: canvas.height + 300 - randomIntFromInterval(100, 150),
-  prevPlatfromX: 200,
-  prevPlatformWidth: canvas.width,
+  prevPlatfromX: canvas.width/3,
+  prevPlatformWidth: 0,
   currentHeight: 0 // New property to track the current height
 };
 
