@@ -118,8 +118,6 @@ function playRandomMeow() {
 
 var platforms = [
   { x: 0, y: canvas.height - 10, width: canvas.width, height: 20 },
-  { x: 1000, y: canvas.height - 210, width: 200, height: 20 },
-  { x: 600, y: canvas.height - 210 - 150, width: 200, height: 20 }
 ];
 
 // Camera object
