@@ -294,6 +294,7 @@ function movePlayer() {
     player.crouching = true;
     player.height = player.crouchHeight;
   } else {
+    if (player.crouching) player.y = player.y - 19; // Stop the player from phasing into the ground
     player.crouching = false;
     player.height = player.originalHeight;
   }
