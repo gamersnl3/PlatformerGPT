@@ -128,17 +128,18 @@ const camera = {
   height: canvas.height,
   follow: function (player) {
     // Horizontal camera movement
-    if (player.x < this.x + 300) {
-      this.x = player.x - 300;
-    } else if (player.x + player.width > this.x + this.width - 300) {
-      this.x = player.x + player.width - this.width + 300;
+    cameraHorizontalThreshold = 300*canvas.width/1920;
+    if (player.x < this.x + cameraHorizontalThreshold) {
+      this.x = player.x - cameraHorizontalThreshold;
+    } else if (player.x + player.width > this.x + this.width - cameraHorizontalThreshold) {
+      this.x = player.x + player.width - this.width + cameraHorizontalThreshold;
     }
-
+    cameraVerticalThreshold = 200*canvas.height/1080;
     // Vertical camera movement
-    if (player.y < this.y + 200) {
-      this.y = player.y - 200;
-    } else if (player.y + player.height > this.y + this.height - 200) {
-      this.y = player.y + player.height - this.height + 200;
+    if (player.y < this.y + cameraVerticalThreshold) {
+      this.y = player.y - cameraVerticalThreshold;
+    } else if (player.y + player.height > this.y + this.height - cameraVerticalThreshold) {
+      this.y = player.y + player.height - this.height + cameraVerticalThreshold;
     }
   }
 };
@@ -371,3 +372,4 @@ playerImage.onload = function () {
 
 // Event listener to resize the canvas when the window is resized
 window.addEventListener('resize', resizeCanvas);
+console.log(canvas.width, canvas.height);
