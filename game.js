@@ -1,6 +1,49 @@
 function randomIntFromInterval(min, max) { // min and max included 
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
+function getColor(intensity) {
+  // Clamp the intensity to the range [0, 80000]
+  intensity = Math.max(0, Math.min(10000, intensity));
+
+  // Define the color points for the gradient
+  const startColor = { r: 135, g: 206, b: 235 }; // Light blue
+  const midColor = { r: 0, g: 0, b: 139 }; // Dark blue
+  const thirdColor = { r: 75, g: 0, b: 130 }; // Dark purple
+  const endColor = { r: 0, g: 0, b: 0 }; // Black
+
+  // Calculate the ratio of the intensity within the range
+  const ratio = intensity / 10000;
+
+  let r, g, b;
+
+  if (ratio < 0.5) {
+    // Transition from light blue to dark blue
+    const midRatio = ratio * 2;
+    r = Math.round(startColor.r * (1 - midRatio) + midColor.r * midRatio);
+    g = Math.round(startColor.g * (1 - midRatio) + midColor.g * midRatio);
+    b = Math.round(startColor.b * (1 - midRatio) + midColor.b * midRatio);
+  } else {
+    // Transition from dark blue to dark purple to black
+    const midRatio = (ratio - 0.5) * 2;
+    if (midRatio < 0.5) {
+      // Transition from dark blue to dark purple
+      const secondRatio = midRatio * 2;
+      r = Math.round(midColor.r * (1 - secondRatio) + thirdColor.r * secondRatio);
+      g = Math.round(midColor.g * (1 - secondRatio) + thirdColor.g * secondRatio);
+      b = Math.round(midColor.b * (1 - secondRatio) + thirdColor.b * secondRatio);
+    } else {
+      // Transition from dark purple to black
+      const thirdRatio = (midRatio - 0.5) * 2;
+      r = Math.round(thirdColor.r * (1 - thirdRatio) + endColor.r * thirdRatio);
+      g = Math.round(thirdColor.g * (1 - thirdRatio) + endColor.g * thirdRatio);
+      b = Math.round(thirdColor.b * (1 - thirdRatio) + endColor.b * thirdRatio);
+    }
+  }
+
+  // Return the resulting color in RGB format
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
 
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
@@ -28,13 +71,37 @@ const player = {
   facingRight: true,
   grounded: false, // New property to check if player is grounded
   maxHeight: Number.MAX_SAFE_INTEGER,
-  newPlatformThreshold: canvas.height + 300 - randomIntFromInterval(100,150),
+  newPlatformThreshold: canvas.height + 300 - randomIntFromInterval(100, 150),
   prevPlatfromX: 200,
   prevPlatformWidth: canvas.width,
   currentHeight: 0 // New property to track the current height
 };
 
 let highScore = localStorage.getItem('highScore') || 0;
+
+const clouds = [];
+const numClouds = 10;
+
+for (let i = 0; i < numClouds; i++) {
+  clouds.push({
+    x: Math.random() * canvas.width,
+    y: canvas.height - Math.random() * canvas.height,
+    width: 100 + Math.random() * 150,
+    height: 50 + Math.random() * 50,
+    speed: 0.5 + Math.random()
+  });
+}
+
+const stars = [];
+const numStars = 100;
+
+for (let i = 0; i < numStars; i++) {
+  stars.push({
+    x: Math.random() * canvas.width,
+    y: canvas.height - Math.random() * canvas.height,
+    size: Math.random() * 2
+  });
+}
 
 // Function to play audio
 function playSound(soundId) {
@@ -46,7 +113,6 @@ function playSound(soundId) {
 function playRandomMeow() {
   const randomIndex = randomIntFromInterval(0, 8);
   const soundId = `meow${randomIndex}`;
-  console.log(soundId)
   playSound(soundId);
 }
 
@@ -64,17 +130,17 @@ const camera = {
   height: canvas.height,
   follow: function (player) {
     // Horizontal camera movement
-    if (player.x < this.x + 200) {
-      this.x = player.x - 200;
-    } else if (player.x + player.width > this.x + this.width - 200) {
-      this.x = player.x + player.width - this.width + 200;
+    if (player.x < this.x + 100) {
+      this.x = player.x - 100;
+    } else if (player.x + player.width > this.x + this.width - 100) {
+      this.x = player.x + player.width - this.width + 100;
     }
 
     // Vertical camera movement
-    if (player.y < this.y + 200) {
-      this.y = player.y - 200;
-    } else if (player.y + player.height > this.y + this.height - 200) {
-      this.y = player.y + player.height - this.height + 200;
+    if (player.y < this.y + 100) {
+      this.y = player.y - 100;
+    } else if (player.y + player.height > this.y + this.height - 100) {
+      this.y = player.y + player.height - this.height + 100;
     }
   }
 };
@@ -110,6 +176,34 @@ function drawPlayer() {
   ctx.restore();
 }
 
+function drawClouds() {
+  clouds.forEach(cloud => {
+    opacity = Math.max(0.5 - Math.max(0, Math.min(10000, Math.max(0, canvas.height - player.y))) / 10000, 0) * 2 * 0.8
+    ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+    ctx.fillRect(cloud.x, cloud.y, cloud.width, cloud.height);
+    cloud.x -= cloud.speed;
+    if (cloud.x + cloud.width < 0) {
+      cloud.x = canvas.width;
+      cloud.y = canvas.height - Math.random() * canvas.height;
+    }
+  });
+}
+
+function drawStars() {
+  stars.forEach(star => {
+    opacity = Math.max(Math.max(0, Math.min(10000, Math.max(0, canvas.height - player.y))) / 10000 - 0.3, 0) * (1/0.7)
+    ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+    ctx.beginPath();
+    ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+    ctx.fill();
+    star.y += 0.1;  // Stars move slightly to create a parallax effect
+    if (star.y > canvas.height) {
+      star.y = -star.size;
+      star.x = Math.random() * canvas.width;
+    }
+  });
+}
+
 function drawPlatforms() {
   platforms.forEach(platform => {
     ctx.fillStyle = platform.height < 20 ? 'red' : 'green';
@@ -120,7 +214,8 @@ function drawPlatforms() {
 function drawScore() {
   ctx.save();
   ctx.font = '24px Arial';
-  ctx.fillStyle = 'black';
+  color = getColor(Math.max(0, canvas.height - player.y)).split(',');
+  ctx.fillStyle = `rgb(${255-color[0].substring(4)},${255-color[1]},${255-color[2].substring(0,color[2].length-1)})`;
   ctx.fillText(`Height: ${Math.max(0, canvas.height - player.y)}`, 10, 30);
   ctx.fillText(`High Score: ${highScore}`, 10, 60);
   ctx.restore();
@@ -142,9 +237,8 @@ function updatePlayer() {
   if (player.y < player.maxHeight) player.maxHeight = player.y;
 
   if (player.maxHeight < player.newPlatformThreshold) {
-    player.newPlatformThreshold = player.newPlatformThreshold - randomIntFromInterval(100,150);
-    console.log(player.maxHeight);
-    width = randomIntFromInterval(100,500);
+    player.newPlatformThreshold = player.newPlatformThreshold - randomIntFromInterval(100, 150);
+    width = randomIntFromInterval(100, 500);
     x = player.prevPlatfromX + randomIntFromInterval(-200 - width, 200 + player.prevPlatformWidth);
     y = player.newPlatformThreshold - 200;
     player.prevPlatfromX = x;
@@ -156,7 +250,7 @@ function updatePlayer() {
     player.dy += gravity;
     player.grounded = false;
   } else {
-    if(player.dy > 30) playRandomMeow();  // Play random meow sound if falling fast
+    if (player.dy > 30) playRandomMeow();  // Play random meow sound if falling fast
     player.dy = 0;
     player.jumping = false;
     player.grounded = true;
@@ -170,7 +264,7 @@ function updatePlayer() {
       player.y + player.height < platform.y + platform.height &&
       player.y + player.height + player.dy >= platform.y
     ) {
-      if(player.dy > 30) playRandomMeow();  // Play random meow sound if falling fast
+      if (player.dy > 30) playRandomMeow();  // Play random meow sound if falling fast
       player.dy = 0;
       player.jumping = false;
       player.grounded = true;
@@ -249,15 +343,19 @@ function clear() {
 function update() {
   clear();
 
+  // Update background color based on height
+  canvas.style.backgroundColor = getColor(Math.max(0, canvas.height - player.y));
+
   // Update camera position to follow the player
   camera.follow(player);
-
+  drawClouds();  // Draw clouds first
+  drawStars();   // Draw stars after clouds for proper layering
   // Translate the canvas context based on the camera position
   ctx.save();
   ctx.translate(-camera.x, -camera.y);
 
-  drawPlayer();
   drawPlatforms();
+  drawPlayer();
   updatePlayer();
   movePlayer();
 
