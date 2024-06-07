@@ -128,17 +128,17 @@ const camera = {
   height: canvas.height,
   follow: function (player) {
     // Horizontal camera movement
-    if (player.x < this.x + 100) {
-      this.x = player.x - 100;
-    } else if (player.x + player.width > this.x + this.width - 100) {
-      this.x = player.x + player.width - this.width + 100;
+    if (player.x < this.x + 300) {
+      this.x = player.x - 300;
+    } else if (player.x + player.width > this.x + this.width - 300) {
+      this.x = player.x + player.width - this.width + 300;
     }
 
     // Vertical camera movement
-    if (player.y < this.y + 100) {
-      this.y = player.y - 100;
-    } else if (player.y + player.height > this.y + this.height - 100) {
-      this.y = player.y + player.height - this.height + 100;
+    if (player.y < this.y + 200) {
+      this.y = player.y - 200;
+    } else if (player.y + player.height > this.y + this.height - 200) {
+      this.y = player.y + player.height - this.height + 200;
     }
   }
 };
