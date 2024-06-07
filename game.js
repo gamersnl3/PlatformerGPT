@@ -17,27 +17,27 @@ function getColor(intensity) {
   let r, g, b;
 
   if (ratio < 0.5) {
-      // Transition from light blue to dark blue
-      const midRatio = ratio * 2;
-      r = Math.round(startColor.r * (1 - midRatio) + midColor.r * midRatio);
-      g = Math.round(startColor.g * (1 - midRatio) + midColor.g * midRatio);
-      b = Math.round(startColor.b * (1 - midRatio) + midColor.b * midRatio);
+    // Transition from light blue to dark blue
+    const midRatio = ratio * 2;
+    r = Math.round(startColor.r * (1 - midRatio) + midColor.r * midRatio);
+    g = Math.round(startColor.g * (1 - midRatio) + midColor.g * midRatio);
+    b = Math.round(startColor.b * (1 - midRatio) + midColor.b * midRatio);
   } else {
-      // Transition from dark blue to dark purple to black
-      const midRatio = (ratio - 0.5) * 2;
-      if (midRatio < 0.5) {
-          // Transition from dark blue to dark purple
-          const secondRatio = midRatio * 2;
-          r = Math.round(midColor.r * (1 - secondRatio) + thirdColor.r * secondRatio);
-          g = Math.round(midColor.g * (1 - secondRatio) + thirdColor.g * secondRatio);
-          b = Math.round(midColor.b * (1 - secondRatio) + thirdColor.b * secondRatio);
-      } else {
-          // Transition from dark purple to black
-          const thirdRatio = (midRatio - 0.5) * 2;
-          r = Math.round(thirdColor.r * (1 - thirdRatio) + endColor.r * thirdRatio);
-          g = Math.round(thirdColor.g * (1 - thirdRatio) + endColor.g * thirdRatio);
-          b = Math.round(thirdColor.b * (1 - thirdRatio) + endColor.b * thirdRatio);
-      }
+    // Transition from dark blue to dark purple to black
+    const midRatio = (ratio - 0.5) * 2;
+    if (midRatio < 0.5) {
+      // Transition from dark blue to dark purple
+      const secondRatio = midRatio * 2;
+      r = Math.round(midColor.r * (1 - secondRatio) + thirdColor.r * secondRatio);
+      g = Math.round(midColor.g * (1 - secondRatio) + thirdColor.g * secondRatio);
+      b = Math.round(midColor.b * (1 - secondRatio) + thirdColor.b * secondRatio);
+    } else {
+      // Transition from dark purple to black
+      const thirdRatio = (midRatio - 0.5) * 2;
+      r = Math.round(thirdColor.r * (1 - thirdRatio) + endColor.r * thirdRatio);
+      g = Math.round(thirdColor.g * (1 - thirdRatio) + endColor.g * thirdRatio);
+      b = Math.round(thirdColor.b * (1 - thirdRatio) + endColor.b * thirdRatio);
+    }
   }
 
   // Return the resulting color in RGB format
