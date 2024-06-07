@@ -178,7 +178,8 @@ function drawPlayer() {
 
 function drawClouds() {
   clouds.forEach(cloud => {
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+    opacity = Math.max(0.5 - Math.max(0, Math.min(10000, Math.max(0, canvas.height - player.y))) / 10000, 0) * 2 * 0.8
+    ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
     ctx.fillRect(cloud.x, cloud.y, cloud.width, cloud.height);
     cloud.x -= cloud.speed;
     if (cloud.x + cloud.width < 0) {
@@ -190,7 +191,8 @@ function drawClouds() {
 
 function drawStars() {
   stars.forEach(star => {
-    ctx.fillStyle = 'white';
+    opacity = Math.max(Math.max(0, Math.min(10000, Math.max(0, canvas.height - player.y))) / 10000 - 0.3, 0) * (1/0.7)
+    ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
     ctx.beginPath();
     ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
     ctx.fill();
@@ -212,7 +214,8 @@ function drawPlatforms() {
 function drawScore() {
   ctx.save();
   ctx.font = '24px Arial';
-  ctx.fillStyle = 'black';
+  color = getColor(Math.max(0, canvas.height - player.y)).split(',');
+  ctx.fillStyle = `rgb(${255-color[0].substring(4)},${255-color[1]},${255-color[2].substring(0,color[2].length-1)})`;
   ctx.fillText(`Height: ${Math.max(0, canvas.height - player.y)}`, 10, 30);
   ctx.fillText(`High Score: ${highScore}`, 10, 60);
   ctx.restore();
