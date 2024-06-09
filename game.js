@@ -248,7 +248,7 @@ function updatePlayer() {
   player.currentHeight = canvas.height - player.y;
 
   // Check and update the high score
-  if (player.currentHeight > highScore) {
+  if (player.currentHeight > highScore && !cheatActivated) {
     highScore = player.currentHeight;
     localStorage.setItem('highScore', highScore);
   }
@@ -296,7 +296,7 @@ function activateCheat() {
   if (!cheatActivated) {
     cheatActivated = true;
     player.jumpBoost = true;
-    alert('Cheat Activated: Jump Boost!');
+    alert('Cheat Activated: Jump Boost!\nHigh score will not update until refresh.');
   }
 }
 
