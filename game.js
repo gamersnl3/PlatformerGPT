@@ -373,16 +373,20 @@ function preventDefaultTouch(e) {
   e.preventDefault();
 }
 
-leftButton.addEventListener('touchstart', (e) => { preventDefaultTouch(e); keys['touchLeft'] = true; });
+function handleTouchButtonPress(button) {
+  updateCheatCodeSequence(button);
+}
+
+leftButton.addEventListener('touchstart', (e) => { preventDefaultTouch(e); keys['touchLeft'] = true; handleTouchButtonPress('ArrowLeft'); });
 leftButton.addEventListener('touchend', (e) => { preventDefaultTouch(e); keys['touchLeft'] = false; });
 
-rightButton.addEventListener('touchstart', (e) => { preventDefaultTouch(e); keys['touchRight'] = true; });
+rightButton.addEventListener('touchstart', (e) => { preventDefaultTouch(e); keys['touchRight'] = true; handleTouchButtonPress('ArrowRight'); });
 rightButton.addEventListener('touchend', (e) => { preventDefaultTouch(e); keys['touchRight'] = false; });
 
-upButton.addEventListener('touchstart', (e) => { preventDefaultTouch(e); keys['touchUp'] = true; });
+upButton.addEventListener('touchstart', (e) => { preventDefaultTouch(e); keys['touchUp'] = true; handleTouchButtonPress('ArrowUp'); });
 upButton.addEventListener('touchend', (e) => { preventDefaultTouch(e); keys['touchUp'] = false; });
 
-downButton.addEventListener('touchstart', (e) => { preventDefaultTouch(e); keys['touchDown'] = true; });
+downButton.addEventListener('touchstart', (e) => { preventDefaultTouch(e); keys['touchDown'] = true; handleTouchButtonPress('ArrowDown'); });
 downButton.addEventListener('touchend', (e) => { preventDefaultTouch(e); keys['touchDown'] = false; });
 
 function clear() {
