@@ -72,12 +72,17 @@ const player = {
   grounded: false, // New property to check if player is grounded
   maxHeight: Number.MAX_SAFE_INTEGER,
   newPlatformThreshold: canvas.height + 300 - randomIntFromInterval(100, 150),
-  prevPlatfromX: canvas.width/3,
+  prevPlatfromX: canvas.width / 3,
   prevPlatformWidth: 0,
   currentHeight: 0 // New property to track the current height
 };
 
 let highScore = localStorage.getItem('highScore') || 0;
+
+let cheatCodeSequence = [];
+const cheatCodePattern = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+const requiredRepetitions = 5;
+let cheatActivated = false;
 
 const clouds = [];
 const numClouds = 10;
@@ -128,13 +133,13 @@ const camera = {
   height: canvas.height,
   follow: function (player) {
     // Horizontal camera movement
-    cameraHorizontalThreshold = 300*canvas.width/1920;
+    cameraHorizontalThreshold = 300 * canvas.width / 1920;
     if (player.x < this.x + cameraHorizontalThreshold) {
       this.x = player.x - cameraHorizontalThreshold;
     } else if (player.x + player.width > this.x + this.width - cameraHorizontalThreshold) {
       this.x = player.x + player.width - this.width + cameraHorizontalThreshold;
     }
-    cameraVerticalThreshold = 200*canvas.height/1080;
+    cameraVerticalThreshold = 200 * canvas.height / 1080;
     // Vertical camera movement
     if (player.y < this.y + cameraVerticalThreshold) {
       this.y = player.y - cameraVerticalThreshold;
@@ -205,7 +210,7 @@ function drawClouds() {
 
 function drawStars() {
   stars.forEach(star => {
-    opacity = Math.max(Math.max(0, Math.min(10000, Math.max(0, canvas.height - player.y))) / 10000 - 0.3, 0) * (1/0.7)
+    opacity = Math.max(Math.max(0, Math.min(10000, Math.max(0, canvas.height - player.y))) / 10000 - 0.3, 0) * (1 / 0.7)
     ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
     ctx.beginPath();
     ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
@@ -229,7 +234,7 @@ function drawScore() {
   ctx.save();
   ctx.font = '24px Arial';
   color = getColor(Math.max(0, canvas.height - player.y)).split(',');
-  ctx.fillStyle = `rgb(${255-color[0].substring(4)},${255-color[1]},${255-color[2].substring(0,color[2].length-1)})`;
+  ctx.fillStyle = `rgb(${255 - color[0].substring(4)},${255 - color[1]},${255 - color[2].substring(0, color[2].length - 1)})`;
   ctx.fillText(`Height: ${Math.max(0, canvas.height - player.y)}`, 10, 30);
   ctx.fillText(`High Score: ${highScore}`, 10, 60);
   ctx.restore();
@@ -287,6 +292,14 @@ function updatePlayer() {
   });
 }
 
+function activateCheat() {
+  if (!cheatActivated) {
+    cheatActivated = true;
+    player.jumpBoost = true;
+    alert('Cheat Activated: Jump Boost!');
+  }
+}
+
 function movePlayer() {
   if (keys['ArrowRight'] || keys['touchRight']) {
     player.dx = player.speed;
@@ -299,7 +312,7 @@ function movePlayer() {
   }
 
   if ((keys['ArrowUp'] || keys['touchUp']) && !player.jumping && player.grounded && !player.crouching) {
-    player.dy = -20;
+    player.dy = player.jumpBoost ? -30 : -20;  // Apply jump boost if activated
     player.jumping = true;
     player.grounded = false;
     playSound('jumpSound');  // Play jump sound
@@ -320,10 +333,31 @@ const keys = {};
 
 function keyDown(e) {
   keys[e.key] = true;
+  updateCheatCodeSequence(e.key);
 }
 
 function keyUp(e) {
   keys[e.key] = false;
+}
+
+function updateCheatCodeSequence(key) {
+  // Add the pressed key to the sequence
+  cheatCodeSequence.push(key);
+
+  // Check if the sequence matches the cheat code pattern repeated 5 times
+  const requiredLength = cheatCodePattern.length * requiredRepetitions;
+  if (cheatCodeSequence.length > requiredLength) {
+    // Remove the oldest entry if the sequence exceeds the required length
+    cheatCodeSequence.shift();
+  }
+
+  // Check if the sequence matches the cheat code pattern
+  if (cheatCodeSequence.length === requiredLength) {
+    const expectedSequence = Array(requiredRepetitions).fill(cheatCodePattern).flat();
+    if (cheatCodeSequence.every((key, index) => key === expectedSequence[index])) {
+      activateCheat();
+    }
+  }
 }
 
 document.addEventListener('keydown', keyDown);
@@ -339,16 +373,20 @@ function preventDefaultTouch(e) {
   e.preventDefault();
 }
 
-leftButton.addEventListener('touchstart', (e) => { preventDefaultTouch(e); keys['touchLeft'] = true; });
+function handleTouchButtonPress(button) {
+  updateCheatCodeSequence(button);
+}
+
+leftButton.addEventListener('touchstart', (e) => { preventDefaultTouch(e); keys['touchLeft'] = true; handleTouchButtonPress('ArrowLeft'); });
 leftButton.addEventListener('touchend', (e) => { preventDefaultTouch(e); keys['touchLeft'] = false; });
 
-rightButton.addEventListener('touchstart', (e) => { preventDefaultTouch(e); keys['touchRight'] = true; });
+rightButton.addEventListener('touchstart', (e) => { preventDefaultTouch(e); keys['touchRight'] = true; handleTouchButtonPress('ArrowRight'); });
 rightButton.addEventListener('touchend', (e) => { preventDefaultTouch(e); keys['touchRight'] = false; });
 
-upButton.addEventListener('touchstart', (e) => { preventDefaultTouch(e); keys['touchUp'] = true; });
+upButton.addEventListener('touchstart', (e) => { preventDefaultTouch(e); keys['touchUp'] = true; handleTouchButtonPress('ArrowUp'); });
 upButton.addEventListener('touchend', (e) => { preventDefaultTouch(e); keys['touchUp'] = false; });
 
-downButton.addEventListener('touchstart', (e) => { preventDefaultTouch(e); keys['touchDown'] = true; });
+downButton.addEventListener('touchstart', (e) => { preventDefaultTouch(e); keys['touchDown'] = true; handleTouchButtonPress('ArrowDown'); });
 downButton.addEventListener('touchend', (e) => { preventDefaultTouch(e); keys['touchDown'] = false; });
 
 function clear() {
@@ -363,7 +401,7 @@ function update() {
 
   // Update camera position to follow the player
   camera.follow(player);
-  
+
   drawClouds();  // Draw clouds first
   drawStars();   // Draw stars after clouds for proper layering
 
@@ -374,7 +412,7 @@ function update() {
   ctx.save();
   ctx.translate(offsetX, offsetY);
   ctx.scale(scale, scale);
-  
+
   // Translate the canvas context based on the camera position
   ctx.translate(-camera.x, -camera.y);
 
