@@ -296,6 +296,9 @@ function activateCheat() {
   if (!cheatActivated) {
     cheatActivated = true;
     player.jumpBoost = true;
+    for (const [key, value] of Object.entries(keys)) {
+      keys[key] = false;
+    }
     alert('Cheat Activated: Jump Boost!\nHigh score will not update until refresh.');
   }
 }
