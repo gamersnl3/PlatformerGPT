@@ -262,9 +262,21 @@ function drawPlanets() {
   if(canvas.height - camera.y>10000 && canvas.height - camera.y<15000){
     ctx.drawImage(planetImages['moon'], canvas.width/2, (canvas.height - camera.y - 10000)/5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
   } else if(canvas.height - camera.y>17000 && canvas.height - camera.y<23000){
-    ctx.drawImage(planetImages['mercury'], canvas.width/2, (canvas.height - camera.y - 10000)/5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
+    ctx.drawImage(planetImages['mercury'], canvas.width/2, (canvas.height - camera.y - 17000)/5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
+  } else if(canvas.height - camera.y>25000 && canvas.height - camera.y<30000){
+    ctx.drawImage(planetImages['venus'], canvas.width/2, (canvas.height - camera.y - 25000)/5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
+  } else if(canvas.height - camera.y>32000 && canvas.height - camera.y<37000){
+    ctx.drawImage(planetImages['mars'], canvas.width/2, (canvas.height - camera.y - 32000)/5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
+  } else if(canvas.height - camera.y>39000 && canvas.height - camera.y<44000){
+    ctx.drawImage(planetImages['jupiter'], canvas.width/2, (canvas.height - camera.y - 39000)/5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
+  } else if(canvas.height - camera.y>46000 && canvas.height - camera.y<51000){
+    ctx.drawImage(planetImages['saturn'], canvas.width/2, (canvas.height - camera.y - 46000)/5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
+  } else if(canvas.height - camera.y>53000 && canvas.height - camera.y<58000){
+    ctx.drawImage(planetImages['uranus'], canvas.width/2, (canvas.height - camera.y - 53000)/5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
+  } else if(canvas.height - camera.y>60000 && canvas.height - camera.y<65000){
+    ctx.drawImage(planetImages['neptune'], canvas.width/2, (canvas.height - camera.y - 60000)/5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
   }
-}
+} 
 
 function drawPlatforms() {
   platforms.forEach(platform => {
