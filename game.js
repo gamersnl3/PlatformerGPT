@@ -56,6 +56,33 @@ const gravity = 1;
 const playerImage = new Image();
 playerImage.src = 'resources/cat.png';  // Player image path
 
+const planetImages = {
+  moon: new Image(),
+  mercury: new Image(),
+  venus: new Image(),
+  mars: new Image(),
+  jupiter: new Image(),
+  saturn: new Image(),
+  uranus: new Image(),
+  neptune: new Image()
+};
+
+const planetUrls = {
+  moon: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/FullMoon2010.jpg/1920px-FullMoon2010.jpg',
+  mercury: 'https://science.nasa.gov/wp-content/uploads/2023/11/mercury-messenger-globe-pia15162.jpg?w=4096&format=jpeg&crop=1',
+  venus: 'https://science.nasa.gov/wp-content/uploads/2016/05/venus2-jpg.webp?w=4096&format=png&crop=1',
+  mars: 'https://upload.wikimedia.org/wikipedia/commons/0/0c/Mars_-_August_30_2021_-_Flickr_-_Kevin_M._Gill.png',
+  jupiter: 'https://upload.wikimedia.org/wikipedia/commons/e/e2/Jupiter.jpg',
+  saturn: 'https://c02.purpledshub.com/uploads/sites/48/2019/10/Hubble-Saturn-f74bbab.jpg?w=1029&webp=1',
+  uranus: 'https://science.nasa.gov/wp-content/uploads/2023/09/PIA01492-1.jpg?w=4096&format=jpeg',
+  neptune: 'https://upload.wikimedia.org/wikipedia/commons/b/b9/Neptune_Voyager2_color_calibrated.png'
+};
+
+for (let planet in planetImages) {
+  if (planetUrls[planet]) {
+    planetImages[planet].src = planetUrls[planet];
+  }
+}
 const player = {
   x: 100,
   y: canvas.height - 150,
