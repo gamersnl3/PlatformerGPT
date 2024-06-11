@@ -2,7 +2,7 @@ function randomIntFromInterval(min, max) { // min and max included
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 function getColor(intensity) {
-  // Clamp the intensity to the range [0, 80000]
+  // Clamp the intensity to the range [0, 10000]
   intensity = Math.max(0, Math.min(10000, intensity));
 
   // Define the color points for the gradient
@@ -44,6 +44,14 @@ function getColor(intensity) {
   return `rgb(${r}, ${g}, ${b})`;
 }
 
+ // Make the player teleport up. Usefull for testing.
+function playerUp(height){
+  player.newPlatformThreshold = canvas.height - height+300;
+  player.prevPlatfromX = player.x;
+  player.prevPlatformWidth = 200;
+  platforms = platforms.concat({ x: player.x, y: canvas.height - height, width: 200, height: Math.floor(Math.random() * 2) * Math.floor(Math.random() * 2) == 1 ? 19 : 20 });
+  player.y = canvas.height - height-100;
+}
 
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
@@ -224,7 +232,7 @@ function drawPlayer() {
 
 function drawClouds() {
   clouds.forEach(cloud => {
-    opacity = Math.max(0.5 - Math.max(0, Math.min(10000, Math.max(0, canvas.height - player.y))) / 10000, 0) * 2 * 0.8
+    opacity = Math.max(0.5 - Math.max(0, Math.min(10000, Math.max(0, canvas.height - camera.y))) / 10000, 0) * 2 * 0.8
     ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
     ctx.fillRect(cloud.x, cloud.y, cloud.width, cloud.height);
     cloud.x -= cloud.speed;
@@ -237,7 +245,7 @@ function drawClouds() {
 
 function drawStars() {
   stars.forEach(star => {
-    opacity = Math.max(Math.max(0, Math.min(10000, Math.max(0, canvas.height - player.y))) / 10000 - 0.3, 0) * (1 / 0.7)
+    opacity = Math.max(Math.max(0, Math.min(10000, Math.max(0, canvas.height - camera.y))) / 10000 - 0.3, 0) * (1 / 0.7)
     ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
     ctx.beginPath();
     ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
@@ -250,6 +258,14 @@ function drawStars() {
   });
 }
 
+function drawPlanets() {
+  if(canvas.height - camera.y>10000 && canvas.height - camera.y<15000){
+    ctx.drawImage(planetImages['moon'], canvas.width/2, (canvas.height - camera.y - 10000)/5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
+  } else if(canvas.height - camera.y>17000 && canvas.height - camera.y<23000){
+    ctx.drawImage(planetImages['mercury'], canvas.width/2, (canvas.height - camera.y - 10000)/5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
+  }
+}
+
 function drawPlatforms() {
   platforms.forEach(platform => {
     ctx.fillStyle = platform.height < 20 ? 'red' : 'green';
@@ -260,7 +276,7 @@ function drawPlatforms() {
 function drawScore() {
   ctx.save();
   ctx.font = '24px Arial';
-  color = getColor(Math.max(0, canvas.height - player.y)).split(',');
+  color = getColor(Math.max(0, canvas.height - camera.y)).split(',');
   ctx.fillStyle = `rgb(${255 - color[0].substring(4)},${255 - color[1]},${255 - color[2].substring(0, color[2].length - 1)})`;
   ctx.fillText(`Height: ${Math.max(0, canvas.height - player.y)}`, 10, 30);
   ctx.fillText(`High Score: ${highScore}`, 10, 60);
@@ -427,13 +443,15 @@ function update() {
   clear();
 
   // Update background color based on height
-  canvas.style.backgroundColor = getColor(Math.max(0, canvas.height - player.y));
+  canvas.style.backgroundColor = getColor(Math.max(0, canvas.height - camera.y));
 
   // Update camera position to follow the player
   camera.follow(player);
 
   drawClouds();  // Draw clouds first
   drawStars();   // Draw stars after clouds for proper layering
+
+  drawPlanets();
 
   const offsetX = (canvas.width - canvas.width * scale) / 2;
   const offsetY = (canvas.height - canvas.height * scale) / 2;
