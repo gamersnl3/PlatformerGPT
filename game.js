@@ -59,6 +59,64 @@ const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+let isPaused = false;
+
+// Sample achievements
+const initialAchievements = [
+  { id: 1, title: "First Jump", description: "Jump for the first time", unlocked: false, image: "resources/cat.png" },
+  { id: 2, title: "High Jumper", description: "Reach a height of 1000", unlocked: false, image: "resources/cat.png" },
+  { id: 3, title: "Speed Runner", description: "Run for 500 meters", unlocked: false, image: "resources/cat.png" },
+];
+
+// Function to load achievements from localStorage
+function loadAchievements() {
+  const savedUnlockedIds = JSON.parse(localStorage.getItem('unlockedAchievements')) || [];
+  return initialAchievements.map(achievement => ({
+    ...achievement,
+    unlocked: savedUnlockedIds.includes(achievement.id)
+  }));
+}
+
+// Function to save achievements to localStorage
+function saveAchievements() {
+  const unlockedIds = achievements
+    .filter(achievement => achievement.unlocked)
+    .map(achievement => achievement.id);
+  localStorage.setItem('unlockedAchievements', JSON.stringify(unlockedIds));
+}
+
+// Load achievements on game start
+let achievements = loadAchievements();
+
+// Function to unlock an achievement
+function unlockAchievement(id) {
+  const achievement = achievements.find(ach => ach.id === id);
+  if (achievement && !achievement.unlocked) {
+    achievement.unlocked = true;
+    saveAchievements();
+    console.log(`Achievement Unlocked: ${achievement.title}`);
+    // You can also add code to display a notification for the unlocked achievement
+  }
+}
+
+// Function to show achievements
+function showAchievements() {
+  const achievementsList = document.getElementById('achievementsList');
+  achievementsList.innerHTML = ''; // Clear previous list
+
+  achievements.forEach(ach => {
+    const achievementElement = document.createElement('div');
+    achievementElement.className = 'achievement';
+    achievementElement.innerHTML = `
+      <img src="${ach.image}" alt="${ach.title}">
+      <h2>${ach.title}</h2>
+      <p>${ach.description}</p>
+      <p style="color: ${ach.unlocked ? '#00FF00' : '#FF0000'}">Status: ${ach.unlocked ? 'Unlocked' : 'Locked'}</p>
+    `;
+    achievementsList.appendChild(achievementElement);
+  });
+}
+
 const gravity = 1;
 
 const playerImage = new Image();
@@ -141,6 +199,16 @@ for (let i = 0; i < numStars; i++) {
     y: canvas.height - Math.random() * canvas.height,
     size: Math.random() * 2
   });
+}
+
+// Function to toggle the pause state
+function togglePause() {
+  isPaused = !isPaused;
+  document.getElementById('pauseMenu').style.display = isPaused ? 'flex' : 'none';
+
+  if (isPaused) {
+    showAchievements();
+  }
 }
 
 // Function to play audio
@@ -537,6 +605,15 @@ upButton.addEventListener('touchend', (e) => { preventDefaultTouch(e); keys['tou
 
 downButton.addEventListener('touchstart', (e) => { preventDefaultTouch(e); keys['touchDown'] = true; handleTouchButtonPress('ArrowDown'); });
 downButton.addEventListener('touchend', (e) => { preventDefaultTouch(e); keys['touchDown'] = false; });
+
+// Event listeners for the pause button
+document.getElementById('pauseButton').addEventListener('click', () => {
+  togglePause();
+});
+
+document.getElementById('resumeButton').addEventListener('click', () => {
+  togglePause();
+});
 
 function clear() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
