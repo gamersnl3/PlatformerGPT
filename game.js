@@ -235,15 +235,19 @@ function drawClouds() {
   clouds.forEach(cloud => {
     if (opacity > 0) {
       ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
-      ctx.fillRect(cloud.x - camera.x, cloud.y, cloud.width, cloud.height);
+      ctx.fillRect(cloud.x - camera.x, cloud.y - camera.y, cloud.width, cloud.height);
     }
     cloud.x -= cloud.speed;
     if (cloud.x + cloud.width - camera.x < 0) {
       cloud.x = canvas.width + camera.x;
-      cloud.y = canvas.height - Math.random() * canvas.height;
+      cloud.y = canvas.height - Math.random() * canvas.height + camera.y;
     } else if (canvas.width - (cloud.x - camera.x) < 0) {
       cloud.x = camera.x - cloud.width;
-      cloud.y = canvas.height - Math.random() * canvas.height;
+      cloud.y = canvas.height - Math.random() * canvas.height + camera.y;
+    } else if(cloud.y - camera.y - canvas.height> 0) {
+      cloud.y = camera.y - cloud.height;
+    } else if(cloud.y - camera.y + cloud.height< 0) {
+      cloud.y = camera.y + canvas.height;
     }
   });
 }
