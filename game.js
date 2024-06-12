@@ -363,14 +363,12 @@ function drawArrow(x, y, direction, length = 50, width = 20, color = 'black') {
 }
 
 
-// 
 function drawPlatforms() {
   platforms.forEach(platform => {
-    if(platform.y <= camera.y + (canvas.height-canvas.height/scale)/2 + canvas.height/scale) console.log(platform.x);
-    if (platform.x + platform.width >= camera.x + (canvas.width-canvas.width/scale)/2
-      && platform.x <= camera.x + (canvas.width-canvas.width/scale)/2 + canvas.width/scale
-      && platform.y + platform.height >= camera.y + (canvas.height-canvas.height/scale)/2 
-      && platform.y <= camera.y + (canvas.height-canvas.height/scale)/2 + canvas.height/scale) {
+    if (platform.x + platform.width >= camera.x + (canvas.width - canvas.width / scale) / 2
+      && platform.x <= camera.x + (canvas.width - canvas.width / scale) / 2 + canvas.width / scale
+      && platform.y + platform.height >= camera.y + (canvas.height - canvas.height / scale) / 2
+      && platform.y <= camera.y + (canvas.height - canvas.height / scale) / 2 + canvas.height / scale) {
       ctx.fillStyle = platform.height < 20 ? 'red' : 'green';
       ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
     }
@@ -583,9 +581,9 @@ function update() {
 
   drawScore(); // Draw the score after restoring the context
 
-  if (camera.x + (canvas.width-canvas.width/scale)/2+canvas.width/scale<0 && canvas.height - player.y <= 248) { // Draw a helpful arrow if the player is on the ground and can't see the first platform
+  if (camera.x + (canvas.width - canvas.width / scale) / 2 + canvas.width / scale < 0 && canvas.height - player.y <= 248) { // Draw a helpful arrow if the player is on the ground and can't see the first platform
     drawArrow(canvas.width - canvas.width / 8, canvas.height / 2, 'right');
-  } else if (camera.x + (canvas.width-canvas.width/scale)/2 -canvas.width>0 && canvas.height - player.y <= 248) {
+  } else if (camera.x + (canvas.width - canvas.width / scale) / 2 - canvas.width > 0 && canvas.height - player.y <= 248) {
     drawArrow(canvas.width / 8, canvas.height / 2, 'left');
   }
 
