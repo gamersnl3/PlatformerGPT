@@ -161,6 +161,12 @@ var platforms = [
 ];
 
 // Camera object
+// Camera boundries:
+// (X - camera.x < 0) left
+// (canvas.width - (X - camera.x) < 0) right
+// (Y - camera.y - canvas.height > 0) down
+// (Y - camera.y < 0) up
+
 const camera = {
   x: 0,
   y: 0,
@@ -244,9 +250,9 @@ function drawClouds() {
     } else if (canvas.width - (cloud.x - camera.x) < 0) {
       cloud.x = camera.x - cloud.width;
       cloud.y = canvas.height - Math.random() * canvas.height + camera.y;
-    } else if(cloud.y - camera.y - canvas.height> 0) {
+    } else if (cloud.y - camera.y - canvas.height > 0) {
       cloud.y = camera.y - cloud.height;
-    } else if(cloud.y - camera.y + cloud.height< 0) {
+    } else if (cloud.y - camera.y + cloud.height < 0) {
       cloud.y = camera.y + canvas.height;
     }
   });
@@ -358,8 +364,10 @@ function drawArrow(x, y, direction, length = 50, width = 20, color = 'black') {
 
 function drawPlatforms() {
   platforms.forEach(platform => {
-    ctx.fillStyle = platform.height < 20 ? 'red' : 'green';
-    ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+    if (platform.x + platform.width >= camera.x && platform.x <= camera.x + canvas.width && platform.y - platform.height <= camera.y + canvas.height && platform.y >= camera.y) {
+      ctx.fillStyle = platform.height < 20 ? 'red' : 'green';
+      ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+    }
   });
 }
 
