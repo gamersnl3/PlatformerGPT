@@ -234,10 +234,13 @@ function drawClouds() {
   clouds.forEach(cloud => {
     opacity = Math.max(0.5 - Math.max(0, Math.min(10000, Math.max(0, canvas.height - camera.y))) / 10000, 0) * 2 * 0.8
     ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
-    ctx.fillRect(cloud.x, cloud.y, cloud.width, cloud.height);
+    ctx.fillRect(cloud.x - camera.x, cloud.y, cloud.width, cloud.height);
     cloud.x -= cloud.speed;
-    if (cloud.x + cloud.width < 0) {
-      cloud.x = canvas.width;
+    if (cloud.x + cloud.width - camera.x < 0) {
+      cloud.x = canvas.width + camera.x;
+      cloud.y = canvas.height - Math.random() * canvas.height;
+    }else if(canvas.width -(cloud.x - camera.x) < 0) {
+      cloud.x = camera.x - cloud.width;
       cloud.y = canvas.height - Math.random() * canvas.height;
     }
   });
@@ -533,12 +536,12 @@ function update() {
 
   // Update camera position to follow the player
   camera.follow(player);
-
-  drawClouds();  // Draw clouds first
+  
   drawStars();   // Draw stars after clouds for proper layering
-
+  
   drawPlanets();
-
+  
+  drawClouds();  // Draw clouds first
   const offsetX = (canvas.width - canvas.width * scale) / 2;
   const offsetY = (canvas.height - canvas.height * scale) / 2;
 
