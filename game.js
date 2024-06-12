@@ -81,7 +81,7 @@ const planetUrls = {
   venus: 'https://science.nasa.gov/wp-content/uploads/2016/05/venus2-jpg.webp?w=4096&format=png&crop=1',
   mars: 'https://upload.wikimedia.org/wikipedia/commons/0/0c/Mars_-_August_30_2021_-_Flickr_-_Kevin_M._Gill.png',
   jupiter: 'https://upload.wikimedia.org/wikipedia/commons/e/e2/Jupiter.jpg',
-  saturn: 'https://c02.purpledshub.com/uploads/sites/48/2019/10/Hubble-Saturn-f74bbab.jpg?w=1029&webp=1',
+  saturn: 'https://planetfacts.org/wp-content/uploads/2023/12/planet_saturn.jpg',
   uranus: 'https://science.nasa.gov/wp-content/uploads/2023/09/PIA01492-1.jpg?w=4096&format=jpeg',
   neptune: 'https://upload.wikimedia.org/wikipedia/commons/b/b9/Neptune_Voyager2_color_calibrated.png'
 };
@@ -294,20 +294,20 @@ function drawPlanets() {
     drawSun(canvas.width - canvas.width/8, canvas.height/8 + (canvas.height - camera.y)/5000 * (canvas.height*1.1), canvas.width/16);
   } else if(canvas.height - camera.y>10000 && canvas.height - camera.y<15000){
     ctx.drawImage(planetImages['moon'], canvas.width/2, (canvas.height - camera.y - 10000)/5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
-  } else if(canvas.height - camera.y>16000 && canvas.height - camera.y<22000){
+  } else if(canvas.height - camera.y>16000 && canvas.height - camera.y<21000){
     ctx.drawImage(planetImages['mercury'], canvas.width/2, (canvas.height - camera.y - 16000)/5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
-  } else if(canvas.height - camera.y>23000 && canvas.height - camera.y<28000){
-    ctx.drawImage(planetImages['venus'], canvas.width/2, (canvas.height - camera.y - 23000)/5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
-  } else if(canvas.height - camera.y>29000 && canvas.height - camera.y<34000){
-    ctx.drawImage(planetImages['mars'], canvas.width/2, (canvas.height - camera.y - 29000)/5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
-  } else if(canvas.height - camera.y>35000 && canvas.height - camera.y<40000){
-    ctx.drawImage(planetImages['jupiter'], canvas.width/2, (canvas.height - camera.y - 35000)/5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
-  } else if(canvas.height - camera.y>41000 && canvas.height - camera.y<46000){
-    ctx.drawImage(planetImages['saturn'], canvas.width/2, (canvas.height - camera.y - 41000)/5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
-  } else if(canvas.height - camera.y>42000 && canvas.height - camera.y<47000){
-    ctx.drawImage(planetImages['uranus'], canvas.width/2, (canvas.height - camera.y - 42000)/5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
-  } else if(canvas.height - camera.y>43000 && canvas.height - camera.y<48000){
-    ctx.drawImage(planetImages['neptune'], canvas.width/2, (canvas.height - camera.y - 43000)/5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
+  } else if(canvas.height - camera.y>22000 && canvas.height - camera.y<27000){
+    ctx.drawImage(planetImages['venus'], canvas.width/2, (canvas.height - camera.y - 22000)/5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
+  } else if(canvas.height - camera.y>28000 && canvas.height - camera.y<33000){
+    ctx.drawImage(planetImages['mars'], canvas.width/2, (canvas.height - camera.y - 28000)/5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
+  } else if(canvas.height - camera.y>34000 && canvas.height - camera.y<39000){
+    ctx.drawImage(planetImages['jupiter'], canvas.width/2, (canvas.height - camera.y - 34000)/5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
+  } else if(canvas.height - camera.y>40000 && canvas.height - camera.y<45000){
+    ctx.drawImage(planetImages['saturn'], canvas.width/2, (canvas.height - camera.y - 40000)/5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
+  } else if(canvas.height - camera.y>46000 && canvas.height - camera.y<51000){
+    ctx.drawImage(planetImages['uranus'], canvas.width/2, (canvas.height - camera.y - 46000)/5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
+  } else if(canvas.height - camera.y>52000 && canvas.height - camera.y<57000){
+    ctx.drawImage(planetImages['neptune'], canvas.width/2, (canvas.height - camera.y - 52000)/5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
   }
 } 
 
