@@ -311,6 +311,42 @@ function drawPlanets() {
   }
 } 
 
+/**
+ * Draw an arrow on the canvas.
+ * @param {number} x - The starting x position of the arrow.
+ * @param {number} y - The starting y position of the arrow.
+ * @param {string} direction - The direction the arrow points ('left' or 'right').
+ * @param {number} [length=50] - The length of the arrow.
+ * @param {number} [width=20] - The width of the arrow.
+ * @param {string} [color='black'] - The color of the arrow.
+ */
+function drawArrow(x, y, direction, length = 50, width = 20, color = 'black') {
+  ctx.fillStyle = color;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+
+  ctx.beginPath();
+
+  if (direction === 'right') {
+    // Draw arrow pointing to the right
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + length, y);
+    ctx.lineTo(x + length - width, y - width);
+    ctx.moveTo(x + length, y);
+    ctx.lineTo(x + length - width, y + width);
+  } else if (direction === 'left') {
+    // Draw arrow pointing to the left
+    ctx.moveTo(x, y);
+    ctx.lineTo(x - length, y);
+    ctx.lineTo(x - length + width, y - width);
+    ctx.moveTo(x - length, y);
+    ctx.lineTo(x - length + width, y + width);
+  }
+
+  ctx.stroke();
+  ctx.closePath();
+}
+
 function drawPlatforms() {
   platforms.forEach(platform => {
     ctx.fillStyle = platform.height < 20 ? 'red' : 'green';
@@ -523,6 +559,12 @@ function update() {
   ctx.restore();
 
   drawScore(); // Draw the score after restoring the context
+
+  if(camera.x<-canvas.width && player.y>=671){ // Draw a helpful arrow if the player is on the ground and can't see the first platform
+    drawArrow(canvas.width-canvas.width/8, canvas.height/2, 'right');
+  } else if(camera.x>canvas.width && player.y>=671){
+    drawArrow(canvas.width/8, canvas.height/2, 'left');
+  }
 
   requestAnimationFrame(update);
 }
