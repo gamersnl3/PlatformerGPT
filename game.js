@@ -44,13 +44,13 @@ function getColor(intensity) {
   return `rgb(${r}, ${g}, ${b})`;
 }
 
- // Make the player teleport up. Usefull for testing.
-function playerUp(height){
-  player.newPlatformThreshold = canvas.height - height+300;
+// Make the player teleport up. Usefull for testing.
+function playerUp(height) {
+  player.newPlatformThreshold = canvas.height - height + 300;
   player.prevPlatfromX = player.x;
   player.prevPlatformWidth = 200;
   platforms = platforms.concat({ x: player.x, y: canvas.height - height, width: 200, height: Math.floor(Math.random() * 2) * Math.floor(Math.random() * 2) == 1 ? 19 : 20 });
-  player.y = canvas.height - height-100;
+  player.y = canvas.height - height - 100;
 }
 
 const canvas = document.getElementById('gameCanvas');
@@ -81,7 +81,7 @@ const planetUrls = {
   venus: 'https://science.nasa.gov/wp-content/uploads/2016/05/venus2-jpg.webp?w=4096&format=png&crop=1',
   mars: 'https://upload.wikimedia.org/wikipedia/commons/0/0c/Mars_-_August_30_2021_-_Flickr_-_Kevin_M._Gill.png',
   jupiter: 'https://upload.wikimedia.org/wikipedia/commons/e/e2/Jupiter.jpg',
-  saturn: 'https://c02.purpledshub.com/uploads/sites/48/2019/10/Hubble-Saturn-f74bbab.jpg?w=1029&webp=1',
+  saturn: 'https://planetfacts.org/wp-content/uploads/2023/12/planet_saturn.jpg',
   uranus: 'https://science.nasa.gov/wp-content/uploads/2023/09/PIA01492-1.jpg?w=4096&format=jpeg',
   neptune: 'https://upload.wikimedia.org/wikipedia/commons/b/b9/Neptune_Voyager2_color_calibrated.png'
 };
@@ -161,6 +161,12 @@ var platforms = [
 ];
 
 // Camera object
+// Camera boundries:
+// (X - camera.x < 0) left
+// (canvas.width - (X - camera.x) < 0) right
+// (Y - camera.y - canvas.height > 0) down
+// (Y - camera.y < 0) up
+
 const camera = {
   x: 0,
   y: 0,
@@ -231,14 +237,23 @@ function drawPlayer() {
 }
 
 function drawClouds() {
+  opacity = Math.max(0.5 - Math.max(0, Math.min(10000, Math.max(0, canvas.height - camera.y))) / 10000, 0) * 2 * 0.8
   clouds.forEach(cloud => {
-    opacity = Math.max(0.5 - Math.max(0, Math.min(10000, Math.max(0, canvas.height - camera.y))) / 10000, 0) * 2 * 0.8
-    ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
-    ctx.fillRect(cloud.x, cloud.y, cloud.width, cloud.height);
+    if (opacity > 0) {
+      ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+      ctx.fillRect(cloud.x - camera.x, cloud.y - camera.y, cloud.width, cloud.height);
+    }
     cloud.x -= cloud.speed;
-    if (cloud.x + cloud.width < 0) {
-      cloud.x = canvas.width;
-      cloud.y = canvas.height - Math.random() * canvas.height;
+    if (cloud.x + cloud.width - camera.x < 0) {
+      cloud.x = canvas.width + camera.x;
+      cloud.y = canvas.height - Math.random() * canvas.height + camera.y;
+    } else if (canvas.width - (cloud.x - camera.x) < 0) {
+      cloud.x = camera.x - cloud.width;
+      cloud.y = canvas.height - Math.random() * canvas.height + camera.y;
+    } else if (cloud.y - camera.y - canvas.height > 0) {
+      cloud.y = camera.y - cloud.height;
+    } else if (cloud.y - camera.y + cloud.height < 0) {
+      cloud.y = camera.y + canvas.height;
     }
   });
 }
@@ -263,7 +278,7 @@ function drawSun(x, y, radius) {
   const gradient = ctx.createRadialGradient(x, y, radius * 0.3, x, y, radius);
   gradient.addColorStop(0, 'yellow');
   gradient.addColorStop(1, 'orange');
-  
+
   ctx.beginPath();
   ctx.arc(x, y, radius, 0, Math.PI * 2, false);
   ctx.fillStyle = gradient;
@@ -290,31 +305,69 @@ function drawSun(x, y, radius) {
 }
 
 function drawPlanets() {
-  if(canvas.height - camera.y<5000){
-    drawSun(canvas.width - canvas.width/8, canvas.height/8 + (canvas.height - camera.y)/5000 * (canvas.height*1.1), canvas.width/16);
-  } else if(canvas.height - camera.y>10000 && canvas.height - camera.y<15000){
-    ctx.drawImage(planetImages['moon'], canvas.width/2, (canvas.height - camera.y - 10000)/5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
-  } else if(canvas.height - camera.y>16000 && canvas.height - camera.y<22000){
-    ctx.drawImage(planetImages['mercury'], canvas.width/2, (canvas.height - camera.y - 16000)/5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
-  } else if(canvas.height - camera.y>23000 && canvas.height - camera.y<28000){
-    ctx.drawImage(planetImages['venus'], canvas.width/2, (canvas.height - camera.y - 23000)/5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
-  } else if(canvas.height - camera.y>29000 && canvas.height - camera.y<34000){
-    ctx.drawImage(planetImages['mars'], canvas.width/2, (canvas.height - camera.y - 29000)/5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
-  } else if(canvas.height - camera.y>35000 && canvas.height - camera.y<40000){
-    ctx.drawImage(planetImages['jupiter'], canvas.width/2, (canvas.height - camera.y - 35000)/5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
-  } else if(canvas.height - camera.y>41000 && canvas.height - camera.y<46000){
-    ctx.drawImage(planetImages['saturn'], canvas.width/2, (canvas.height - camera.y - 41000)/5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
-  } else if(canvas.height - camera.y>42000 && canvas.height - camera.y<47000){
-    ctx.drawImage(planetImages['uranus'], canvas.width/2, (canvas.height - camera.y - 42000)/5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
-  } else if(canvas.height - camera.y>43000 && canvas.height - camera.y<48000){
-    ctx.drawImage(planetImages['neptune'], canvas.width/2, (canvas.height - camera.y - 43000)/5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
+  if (canvas.height - camera.y < 5000) {
+    drawSun(canvas.width - canvas.width / 8, canvas.height / 8 + (canvas.height - camera.y) / 5000 * (canvas.height * 1.1), canvas.width / 16);
+  } else if (canvas.height - camera.y > 10000 && canvas.height - camera.y < 15000) {
+    ctx.drawImage(planetImages['moon'], canvas.width / 2, (canvas.height - camera.y - 10000) / 5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
+  } else if (canvas.height - camera.y > 16000 && canvas.height - camera.y < 21000) {
+    ctx.drawImage(planetImages['mercury'], canvas.width / 2, (canvas.height - camera.y - 16000) / 5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
+  } else if (canvas.height - camera.y > 22000 && canvas.height - camera.y < 27000) {
+    ctx.drawImage(planetImages['venus'], canvas.width / 2, (canvas.height - camera.y - 22000) / 5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
+  } else if (canvas.height - camera.y > 28000 && canvas.height - camera.y < 33000) {
+    ctx.drawImage(planetImages['mars'], canvas.width / 2, (canvas.height - camera.y - 28000) / 5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
+  } else if (canvas.height - camera.y > 34000 && canvas.height - camera.y < 39000) {
+    ctx.drawImage(planetImages['jupiter'], canvas.width / 2, (canvas.height - camera.y - 34000) / 5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
+  } else if (canvas.height - camera.y > 40000 && canvas.height - camera.y < 45000) {
+    ctx.drawImage(planetImages['saturn'], canvas.width / 2, (canvas.height - camera.y - 40000) / 5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
+  } else if (canvas.height - camera.y > 46000 && canvas.height - camera.y < 51000) {
+    ctx.drawImage(planetImages['uranus'], canvas.width / 2, (canvas.height - camera.y - 46000) / 5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
+  } else if (canvas.height - camera.y > 52000 && canvas.height - camera.y < 57000) {
+    ctx.drawImage(planetImages['neptune'], canvas.width / 2, (canvas.height - camera.y - 52000) / 5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
   }
-} 
+}
+
+/**
+ * Draw an arrow on the canvas.
+ * @param {number} x - The starting x position of the arrow.
+ * @param {number} y - The starting y position of the arrow.
+ * @param {string} direction - The direction the arrow points ('left' or 'right').
+ * @param {number} [length=50] - The length of the arrow.
+ * @param {number} [width=20] - The width of the arrow.
+ * @param {string} [color='black'] - The color of the arrow.
+ */
+function drawArrow(x, y, direction, length = 50, width = 20, color = 'black') {
+  ctx.fillStyle = color;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+
+  ctx.beginPath();
+
+  if (direction === 'right') {
+    // Draw arrow pointing to the right
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + length, y);
+    ctx.lineTo(x + length - width, y - width);
+    ctx.moveTo(x + length, y);
+    ctx.lineTo(x + length - width, y + width);
+  } else if (direction === 'left') {
+    // Draw arrow pointing to the left
+    ctx.moveTo(x, y);
+    ctx.lineTo(x - length, y);
+    ctx.lineTo(x - length + width, y - width);
+    ctx.moveTo(x - length, y);
+    ctx.lineTo(x - length + width, y + width);
+  }
+
+  ctx.stroke();
+  ctx.closePath();
+}
 
 function drawPlatforms() {
   platforms.forEach(platform => {
-    ctx.fillStyle = platform.height < 20 ? 'red' : 'green';
-    ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+    if (platform.x + platform.width >= camera.x && platform.x <= camera.x + canvas.width && platform.y - platform.height <= camera.y + canvas.height && platform.y >= camera.y) {
+      ctx.fillStyle = platform.height < 20 ? 'red' : 'green';
+      ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+    }
   });
 }
 
@@ -498,11 +551,11 @@ function update() {
   // Update camera position to follow the player
   camera.follow(player);
 
-  drawClouds();  // Draw clouds first
   drawStars();   // Draw stars after clouds for proper layering
 
   drawPlanets();
 
+  drawClouds();  // Draw clouds first
   const offsetX = (canvas.width - canvas.width * scale) / 2;
   const offsetY = (canvas.height - canvas.height * scale) / 2;
 
@@ -523,6 +576,12 @@ function update() {
   ctx.restore();
 
   drawScore(); // Draw the score after restoring the context
+
+  if (camera.x < -canvas.width && player.y >= 671) { // Draw a helpful arrow if the player is on the ground and can't see the first platform
+    drawArrow(canvas.width - canvas.width / 8, canvas.height / 2, 'right');
+  } else if (camera.x > canvas.width && player.y >= 671) {
+    drawArrow(canvas.width / 8, canvas.height / 2, 'left');
+  }
 
   requestAnimationFrame(update);
 }
