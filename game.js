@@ -312,16 +312,16 @@ function drawClouds() {
       ctx.fillRect(cloud.x - camera.x, cloud.y - camera.y, cloud.width, cloud.height);
     }
     cloud.x -= cloud.speed;
-    if (cloud.x + cloud.width - camera.x < 0) {
-      cloud.x = canvas.width + camera.x;
+    if (cloud.x + cloud.width < camera.x + (canvas.width - canvas.width / scale) / 2) {
+      cloud.x = camera.x + (canvas.width - canvas.width / scale) / 2 + canvas.width / scale;
+      cloud.y = camera.y + (canvas.height - canvas.height / scale) / 2 - Math.random() * canvas.height / scale + camera.y;
+    } else if (camera.x + (canvas.width - canvas.width / scale) / 2 + canvas.width / scale < cloud.x) {
+      cloud.x = camera.x + (canvas.width - canvas.width / scale) / 2 - cloud.width;
       cloud.y = canvas.height - Math.random() * canvas.height + camera.y;
-    } else if (canvas.width - (cloud.x - camera.x) < 0) {
-      cloud.x = camera.x - cloud.width;
-      cloud.y = canvas.height - Math.random() * canvas.height + camera.y;
-    } else if (cloud.y - camera.y - canvas.height > 0) {
-      cloud.y = camera.y - cloud.height;
-    } else if (cloud.y - camera.y + cloud.height < 0) {
-      cloud.y = camera.y + canvas.height;
+    } else if (cloud.y > camera.y + (canvas.height - canvas.height / scale) / 2 + canvas.height / scale) {
+      cloud.y = camera.y + (canvas.height - canvas.height / scale) / 2 - cloud.height;
+    } else if (cloud.y + cloud.height < camera.y + (canvas.height - canvas.height / scale) / 2) {
+      cloud.y = camera.y + (canvas.height - canvas.height / scale) / 2 + canvas.height / scale;
     }
   });
 }
@@ -430,9 +430,13 @@ function drawArrow(x, y, direction, length = 50, width = 20, color = 'black') {
   ctx.closePath();
 }
 
+
 function drawPlatforms() {
   platforms.forEach(platform => {
-    if (platform.x + platform.width >= camera.x && platform.x <= camera.x + canvas.width && platform.y - platform.height <= camera.y + canvas.height && platform.y >= camera.y) {
+    if (platform.x + platform.width >= camera.x + (canvas.width - canvas.width / scale) / 2
+      && platform.x <= camera.x + (canvas.width - canvas.width / scale) / 2 + canvas.width / scale
+      && platform.y + platform.height >= camera.y + (canvas.height - canvas.height / scale) / 2
+      && platform.y <= camera.y + (canvas.height - canvas.height / scale) / 2 + canvas.height / scale) {
       ctx.fillStyle = platform.height < 20 ? 'red' : 'green';
       ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
     }
@@ -632,15 +636,14 @@ function update() {
 
   drawPlanets();
 
-  drawClouds();  // Draw clouds first
   const offsetX = (canvas.width - canvas.width * scale) / 2;
   const offsetY = (canvas.height - canvas.height * scale) / 2;
-
+  // platforms = platforms.concat({ x: camera.x + (canvas.width-canvas.width/scale)/2, y: camera.y + (canvas.height-canvas.height/scale)/2, width: canvas.width/scale, height: canvas.height/scale });
   // Apply scaling
   ctx.save();
   ctx.translate(offsetX, offsetY);
   ctx.scale(scale, scale);
-
+  drawClouds();  // Draw clouds first
   // Translate the canvas context based on the camera position
   ctx.translate(-camera.x, -camera.y);
 
@@ -654,9 +657,9 @@ function update() {
 
   drawScore(); // Draw the score after restoring the context
 
-  if (camera.x < -canvas.width && player.y >= 671) { // Draw a helpful arrow if the player is on the ground and can't see the first platform
+  if (camera.x + (canvas.width - canvas.width / scale) / 2 + canvas.width / scale < 0 && canvas.height - player.y <= 248) { // Draw a helpful arrow if the player is on the ground and can't see the first platform
     drawArrow(canvas.width - canvas.width / 8, canvas.height / 2, 'right');
-  } else if (camera.x > canvas.width && player.y >= 671) {
+  } else if (camera.x + (canvas.width - canvas.width / scale) / 2 - canvas.width > 0 && canvas.height - player.y <= 248) {
     drawArrow(canvas.width / 8, canvas.height / 2, 'left');
   }
 
