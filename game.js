@@ -314,10 +314,10 @@ function drawClouds() {
     cloud.x -= cloud.speed;
     if (cloud.x + cloud.width < camera.x + (canvas.width - canvas.width / scale) / 2) {
       cloud.x = camera.x + (canvas.width - canvas.width / scale) / 2 + canvas.width / scale;
-      cloud.y = camera.y + (canvas.height - canvas.height / scale) / 2 - Math.random() * canvas.height / scale + camera.y;
+      cloud.y = camera.y + (canvas.height - canvas.height / scale) / 2 + Math.random() * canvas.height / scale;
     } else if (camera.x + (canvas.width - canvas.width / scale) / 2 + canvas.width / scale < cloud.x) {
       cloud.x = camera.x + (canvas.width - canvas.width / scale) / 2 - cloud.width;
-      cloud.y = canvas.height - Math.random() * canvas.height + camera.y;
+      cloud.y = camera.y + (canvas.height - canvas.height / scale) / 2 + Math.random() * canvas.height / scale;
     } else if (cloud.y > camera.y + (canvas.height - canvas.height / scale) / 2 + canvas.height / scale) {
       cloud.y = camera.y + (canvas.height - canvas.height / scale) / 2 - cloud.height;
     } else if (cloud.y + cloud.height < camera.y + (canvas.height - canvas.height / scale) / 2) {
