@@ -244,16 +244,22 @@ function drawClouds() {
       ctx.fillRect(cloud.x - camera.x, cloud.y - camera.y, cloud.width, cloud.height);
     }
     cloud.x -= cloud.speed;
-    if (cloud.x + cloud.width - camera.x < 0) {
-      cloud.x = canvas.width + camera.x;
+    // (platform.x + platform.width >= camera.x + (canvas.width - canvas.width / scale) / 2
+    //   && platform.x <= camera.x + (canvas.width - canvas.width / scale) / 2 + canvas.width / scale
+    //   && platform.y + platform.height >= camera.y + (canvas.height - canvas.height / scale) / 2
+    //   && platform.y <= camera.y + (canvas.height - canvas.height / scale) / 2 + canvas.height / scale)
+    if (cloud.x + cloud.width < camera.x + (canvas.width - canvas.width / scale) / 2) {
+      cloud.x = camera.x + (canvas.width-canvas.width/scale)/2 + canvas.width/scale;
+      cloud.y = camera.y + (canvas.height-canvas.height/scale)/2 - Math.random() * canvas.height/scale + camera.y;
+    } else if (camera.x + (canvas.width-canvas.width/scale)/2 + canvas.width/scale < cloud.x) {
+      cloud.x = camera.x + (canvas.width - canvas.width / scale) / 2 - cloud.width;
       cloud.y = canvas.height - Math.random() * canvas.height + camera.y;
-    } else if (canvas.width - (cloud.x - camera.x) < 0) {
-      cloud.x = camera.x - cloud.width;
-      cloud.y = canvas.height - Math.random() * canvas.height + camera.y;
-    } else if (cloud.y - camera.y - canvas.height > 0) {
-      cloud.y = camera.y - cloud.height;
-    } else if (cloud.y - camera.y + cloud.height < 0) {
-      cloud.y = camera.y + canvas.height;
+    } else if (cloud.y > camera.y + (canvas.height-canvas.height/scale)/2 + canvas.height/scale) {
+      cloud.y = camera.y + (canvas.height-canvas.height/scale)/2 - cloud.height;
+    } 
+    else if (cloud.y + cloud.height < camera.y + (canvas.height-canvas.height/scale)/2) {
+      console.log(4);
+      cloud.y = camera.y + (canvas.height-canvas.height/scale)/2 + canvas.height/scale;
     }
   });
 }
@@ -559,7 +565,6 @@ function update() {
 
   drawPlanets();
 
-  drawClouds();  // Draw clouds first
   const offsetX = (canvas.width - canvas.width * scale) / 2;
   const offsetY = (canvas.height - canvas.height * scale) / 2;
   // platforms = platforms.concat({ x: camera.x + (canvas.width-canvas.width/scale)/2, y: camera.y + (canvas.height-canvas.height/scale)/2, width: canvas.width/scale, height: canvas.height/scale });
@@ -567,7 +572,7 @@ function update() {
   ctx.save();
   ctx.translate(offsetX, offsetY);
   ctx.scale(scale, scale);
-
+  drawClouds();  // Draw clouds first
   // Translate the canvas context based on the camera position
   ctx.translate(-camera.x, -camera.y);
 
