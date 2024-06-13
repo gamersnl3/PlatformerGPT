@@ -719,7 +719,7 @@ function update() {
 
   if (camera.x + (canvas.width - canvas.width / scale) / 2 + canvas.width / scale < 0 && player.currentHeight <= 248) { // Draw a helpful arrow if the player is on the ground and can't see the first platform
     drawArrow(canvas.width - canvas.width / 8, canvas.height / 2, 'right');
-  } else if (camera.x + (canvas.width - canvas.width / scale) / 2 - canvas.width > 0 && player.currentHeight <= 248) {
+  } else if (camera.x + (canvas.width - canvas.width / scale) / 2 - platforms[0].width > 0 && player.currentHeight <= 248) {
     drawArrow(canvas.width / 8, canvas.height / 2, 'left');
   }
 
