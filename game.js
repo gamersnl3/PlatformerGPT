@@ -59,6 +59,104 @@ const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+let isPaused = false;
+
+// Sample achievements
+const initialAchievements = [
+  { id: 1, title: "First Jump", description: "Jump for the first time", unlocked: false, image: "resources/cat.png" },
+  { id: 2, title: "High Jumper", description: "Reach a height of 1000", unlocked: false, image: "resources/cat.png" },
+  { id: 3, title: "Speed Runner", description: "Run for 500 meters", unlocked: false, image: "resources/cat.png" },
+  { id: 4, title: "Frequent Flyer", description: "Jump 1000 times", unlocked: false, image: "resources/cat.png" },
+  { id: 5, title: "Lunar Explorer", description: "Reach the Moon and marvel at its beauty", unlocked: false, image: "resources/cat.png" },
+  { id: 6, title: "Mercurial Messenger", description: "Travel far enough to reach Mercury", unlocked: false, image: "resources/cat.png" },
+  { id: 7, title: "Venusian Voyager", description: "Set your sights on Venus and get there", unlocked: false, image: "resources/cat.png" },
+  { id: 8, title: "Martian Adventurer", description: "Reach the red planet Mars", unlocked: false, image: "resources/cat.png" },
+  { id: 9, title: "Jovian Journeyman", description: "Make it all the way to Jupiter", unlocked: false, image: "resources/cat.png" },
+  { id: 10, title: "Saturnian Scout", description: "Navigate the cosmos to find Saturn", unlocked: false, image: "resources/cat.png" },
+  { id: 11, title: "Uranian Pioneer", description: "Reach the distant planet Uranus", unlocked: false, image: "resources/cat.png" },
+  { id: 12, title: "Neptunian Navigator", description: "Venture far enough to discover Neptune", unlocked: false, image: "resources/cat.png" },
+];
+
+// Function to load achievements from localStorage
+function loadAchievements() {
+  const savedUnlockedIds = JSON.parse(localStorage.getItem('unlockedAchievements')) || [];
+  return initialAchievements.map(achievement => ({
+    ...achievement,
+    unlocked: savedUnlockedIds.includes(achievement.id)
+  }));
+}
+
+// Function to save achievements to localStorage
+function saveAchievements() {
+  const unlockedIds = achievements
+    .filter(achievement => achievement.unlocked)
+    .map(achievement => achievement.id);
+  localStorage.setItem('unlockedAchievements', JSON.stringify(unlockedIds));
+}
+
+// Load achievements on game start
+let achievements = loadAchievements();
+
+// Function to unlock an achievement
+function unlockAchievement(id) {
+  const achievement = achievements.find(ach => ach.id === id);
+  if (achievement && !achievement.unlocked) {
+    achievement.unlocked = true;
+    saveAchievements();
+    console.log(`Achievement Unlocked: ${achievement.title}`);
+    showNotification(achievement);
+  }
+}
+
+// Function to lock an achievement
+function lockAchievement(id) {
+  const achievement = achievements.find(ach => ach.id === id);
+  if (achievement && achievement.unlocked) {
+    achievement.unlocked = false;
+    saveAchievements();
+    console.log(`Achievement locked: ${achievement.title}`);
+  }
+}
+
+// Function to show achievements
+function showAchievements() {
+  const achievementsList = document.getElementById('achievementsList');
+  achievementsList.innerHTML = ''; // Clear previous list
+
+  achievements.forEach(ach => {
+    const achievementElement = document.createElement('div');
+    achievementElement.className = 'achievement';
+    achievementElement.innerHTML = `
+      <img src="${ach.image}" alt="${ach.title}">
+      <h2>${ach.title}</h2>
+      <p>${ach.description}</p>
+      <p style="color: ${ach.unlocked ? '#00FF00' : '#FF0000'}">Status: ${ach.unlocked ? 'Unlocked' : 'Locked'}</p>
+    `;
+    achievementsList.appendChild(achievementElement);
+  });
+}
+
+// Function to show notification
+function showNotification(achievement) {
+  const notifications = document.getElementById('notifications');
+  const notification = document.createElement('div');
+  notification.className = 'notification';
+  notification.innerHTML = `
+    <img src="${achievement.image}" alt="${achievement.title}">
+    <div class="notification-content">
+      <strong>${achievement.title}</strong>
+      <p>${achievement.description.slice(0, 50)}...</p>
+    </div>
+  `;
+  notifications.appendChild(notification);
+
+  // Automatically remove the notification after 3 seconds
+  setTimeout(() => {
+    notification.style.opacity = 0;
+    setTimeout(() => notifications.removeChild(notification), 500);
+  }, 3000);
+}
+
 const gravity = 1;
 
 const playerImage = new Image();
@@ -109,7 +207,9 @@ const player = {
   newPlatformThreshold: canvas.height + 300 - randomIntFromInterval(100, 150),
   prevPlatfromX: canvas.width / 3,
   prevPlatformWidth: 0,
-  currentHeight: 0 // New property to track the current height
+  currentHeight: 0, // New property to track the current height
+  jumps: Number.parseInt(localStorage.getItem('jumps')) || 0,
+  metersMoved: Number.parseInt(localStorage.getItem('metersMoved')) || 0,
 };
 
 let highScore = localStorage.getItem('highScore') || 0;
@@ -141,6 +241,16 @@ for (let i = 0; i < numStars; i++) {
     y: canvas.height - Math.random() * canvas.height,
     size: Math.random() * 2
   });
+}
+
+// Function to toggle the pause state
+function togglePause() {
+  isPaused = !isPaused;
+  document.getElementById('pauseMenu').style.display = isPaused ? 'flex' : 'none';
+
+  if (isPaused) {
+    showAchievements();
+  }
 }
 
 // Function to play audio
@@ -246,10 +356,10 @@ function drawClouds() {
     cloud.x -= cloud.speed;
     if (cloud.x + cloud.width < camera.x + (canvas.width - canvas.width / scale) / 2) {
       cloud.x = camera.x + (canvas.width - canvas.width / scale) / 2 + canvas.width / scale;
-      cloud.y = camera.y + (canvas.height - canvas.height / scale) / 2 - Math.random() * canvas.height / scale + camera.y;
+      cloud.y = camera.y + (canvas.height - canvas.height / scale) / 2 + Math.random() * canvas.height / scale;
     } else if (camera.x + (canvas.width - canvas.width / scale) / 2 + canvas.width / scale < cloud.x) {
       cloud.x = camera.x + (canvas.width - canvas.width / scale) / 2 - cloud.width;
-      cloud.y = canvas.height - Math.random() * canvas.height + camera.y;
+      cloud.y = camera.y + (canvas.height - canvas.height / scale) / 2 + Math.random() * canvas.height / scale;
     } else if (cloud.y > camera.y + (canvas.height - canvas.height / scale) / 2 + canvas.height / scale) {
       cloud.y = camera.y + (canvas.height - canvas.height / scale) / 2 - cloud.height;
     } else if (cloud.y + cloud.height < camera.y + (canvas.height - canvas.height / scale) / 2) {
@@ -308,20 +418,28 @@ function drawPlanets() {
   if (canvas.height - camera.y < 5000) {
     drawSun(canvas.width - canvas.width / 8, canvas.height / 8 + (canvas.height - camera.y) / 5000 * (canvas.height * 1.1), canvas.width / 16);
   } else if (canvas.height - camera.y > 10000 && canvas.height - camera.y < 15000) {
+    if (!achievements.find(ach => ach.id === 5).unlocked && canvas.height - camera.y > 11000 && !cheatActivated) unlockAchievement(5);
     ctx.drawImage(planetImages['moon'], canvas.width / 2, (canvas.height - camera.y - 10000) / 5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
   } else if (canvas.height - camera.y > 16000 && canvas.height - camera.y < 21000) {
+    if (!achievements.find(ach => ach.id === 6).unlocked && canvas.height - camera.y > 17000 && !cheatActivated) unlockAchievement(6);
     ctx.drawImage(planetImages['mercury'], canvas.width / 2, (canvas.height - camera.y - 16000) / 5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
   } else if (canvas.height - camera.y > 22000 && canvas.height - camera.y < 27000) {
+    if (!achievements.find(ach => ach.id === 7).unlocked && canvas.height - camera.y > 23000 && !cheatActivated) unlockAchievement(7);
     ctx.drawImage(planetImages['venus'], canvas.width / 2, (canvas.height - camera.y - 22000) / 5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
   } else if (canvas.height - camera.y > 28000 && canvas.height - camera.y < 33000) {
+    if (!achievements.find(ach => ach.id === 8).unlocked && canvas.height - camera.y > 29000 && !cheatActivated) unlockAchievement(8);
     ctx.drawImage(planetImages['mars'], canvas.width / 2, (canvas.height - camera.y - 28000) / 5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
   } else if (canvas.height - camera.y > 34000 && canvas.height - camera.y < 39000) {
+    if (!achievements.find(ach => ach.id === 9).unlocked && canvas.height - camera.y > 35000 && !cheatActivated) unlockAchievement(9);
     ctx.drawImage(planetImages['jupiter'], canvas.width / 2, (canvas.height - camera.y - 34000) / 5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
   } else if (canvas.height - camera.y > 40000 && canvas.height - camera.y < 45000) {
+    if (!achievements.find(ach => ach.id === 10).unlocked && canvas.height - camera.y > 41000 && !cheatActivated) unlockAchievement(10);
     ctx.drawImage(planetImages['saturn'], canvas.width / 2, (canvas.height - camera.y - 40000) / 5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
   } else if (canvas.height - camera.y > 46000 && canvas.height - camera.y < 51000) {
+    if (!achievements.find(ach => ach.id === 11).unlocked && canvas.height - camera.y > 47000 && !cheatActivated) unlockAchievement(11);
     ctx.drawImage(planetImages['uranus'], canvas.width / 2, (canvas.height - camera.y - 46000) / 5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
   } else if (canvas.height - camera.y > 52000 && canvas.height - camera.y < 57000) {
+    if (!achievements.find(ach => ach.id === 12).unlocked && canvas.height - camera.y > 53000 && !cheatActivated) unlockAchievement(12);
     ctx.drawImage(planetImages['neptune'], canvas.width / 2, (canvas.height - camera.y - 52000) / 5000 * (canvas.height + canvas.width) - canvas.width, canvas.width, canvas.width);
   }
 }
@@ -380,7 +498,7 @@ function drawScore() {
   ctx.font = '24px Arial';
   color = getColor(Math.max(0, canvas.height - camera.y)).split(',');
   ctx.fillStyle = `rgb(${255 - color[0].substring(4)},${255 - color[1]},${255 - color[2].substring(0, color[2].length - 1)})`;
-  ctx.fillText(`Height: ${Math.max(0, canvas.height - player.y)}`, 10, 30);
+  ctx.fillText(`Height: ${Math.max(0, player.currentHeight)}`, 10, 30);
   ctx.fillText(`High Score: ${highScore}`, 10, 60);
   ctx.restore();
 }
@@ -392,6 +510,10 @@ function updatePlayer() {
   // Update current height
   player.currentHeight = canvas.height - player.y;
 
+  if (!cheatActivated && !achievements.find(ach => ach.id === 2).unlocked && player.currentHeight >= 1000) unlockAchievement(2);
+  if (!cheatActivated && player.grounded) player.metersMoved += Math.abs(player.dx / 200);
+  localStorage.setItem('metersMoved', player.metersMoved);
+  if (!cheatActivated && !achievements.find(ach => ach.id === 3).unlocked && player.metersMoved >= 500) unlockAchievement(3);
   // Check and update the high score
   if (player.currentHeight > highScore && !cheatActivated) {
     highScore = player.currentHeight;
@@ -465,6 +587,10 @@ function movePlayer() {
   }
 
   if ((keys['ArrowUp'] || keys['touchUp']) && !player.jumping && player.grounded && !player.crouching) {
+    if (!cheatActivated) player.jumps++;
+    localStorage.setItem('jumps', player.jumps);
+    if (!achievements.find(ach => ach.id === 1).unlocked && !cheatActivated && player.jumps >= 1) unlockAchievement(1);
+    if (!achievements.find(ach => ach.id === 4).unlocked && !cheatActivated && player.jumps >= 1000) unlockAchievement(4);
     player.dy = player.jumpBoost ? -30 : -20;  // Apply jump boost if activated
     player.jumping = true;
     player.grounded = false;
@@ -542,6 +668,17 @@ upButton.addEventListener('touchend', (e) => { preventDefaultTouch(e); keys['tou
 downButton.addEventListener('touchstart', (e) => { preventDefaultTouch(e); keys['touchDown'] = true; handleTouchButtonPress('ArrowDown'); });
 downButton.addEventListener('touchend', (e) => { preventDefaultTouch(e); keys['touchDown'] = false; });
 
+// Event listeners for the pause button
+document.getElementById('pauseButton').addEventListener('click', () => {
+  togglePause();
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    togglePause();
+  }
+});
+
 function clear() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
@@ -580,9 +717,9 @@ function update() {
 
   drawScore(); // Draw the score after restoring the context
 
-  if (camera.x + (canvas.width - canvas.width / scale) / 2 + canvas.width / scale < 0 && canvas.height - player.y <= 248) { // Draw a helpful arrow if the player is on the ground and can't see the first platform
+  if (camera.x + (canvas.width - canvas.width / scale) / 2 + canvas.width / scale < 0 && player.currentHeight <= 248) { // Draw a helpful arrow if the player is on the ground and can't see the first platform
     drawArrow(canvas.width - canvas.width / 8, canvas.height / 2, 'right');
-  } else if (camera.x + (canvas.width - canvas.width / scale) / 2 - canvas.width > 0 && canvas.height - player.y <= 248) {
+  } else if (camera.x + (canvas.width - canvas.width / scale) / 2 - canvas.width > 0 && player.currentHeight <= 248) {
     drawArrow(canvas.width / 8, canvas.height / 2, 'left');
   }
 
